@@ -1,11 +1,61 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Sparkles, Zap, MessageSquare, Image, Target, Layers, Edit3, Repeat, Star, Menu } from "lucide-react";
+import { ChevronDown, Sparkles, Zap, MessageSquare, Image, Target, Layers, Edit3, Repeat, Star, Menu, Upload, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
 
 export default function Home() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedResult, setGeneratedResult] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!selectedImage || !prompt.trim()) return;
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          prompt: prompt,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.result) {
+        setGeneratedResult(data.result);
+      } else {
+        alert('Generation failed: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to generate image');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50">
       {/* Header */}
@@ -165,11 +215,30 @@ export default function Home() {
                   <p className="text-xs text-yellow-700">Enable batch mode to process multiple images at once</p>
                 </div>
 
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <div className="text-4xl mb-2">+</div>
-                  <p className="text-sm text-gray-600">Add Image</p>
-                  <p className="text-xs text-gray-500">Max 50MB</p>
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-orange-400 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {selectedImage ? (
+                    <div className="space-y-2">
+                      <img src={selectedImage} alt="Uploaded" className="w-full h-32 object-cover rounded-lg" />
+                      <p className="text-sm text-green-600">Image uploaded</p>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Add Image</p>
+                      <p className="text-xs text-gray-500">Max 50MB</p>
+                    </>
+                  )}
                 </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -180,15 +249,30 @@ export default function Home() {
                     className="w-full p-3 border border-gray-300 rounded-lg resize-none"
                     rows={3}
                     placeholder="A futuristic city powered by nano technology, golden hour lighting, ultra detailed..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
                   />
                   <Button size="sm" variant="ghost" className="mt-2 text-xs">
                     Copy
                   </Button>
                 </div>
 
-                <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-medium py-3">
-                  <Zap className="w-4 h-4 mr-2" />
-                  Generate Now
+                <Button
+                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-medium py-3 disabled:opacity-50"
+                  onClick={handleGenerate}
+                  disabled={!selectedImage || !prompt.trim() || isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Generate Now
+                    </>
+                  )}
                 </Button>
               </div>
             </Card>
@@ -206,11 +290,29 @@ export default function Home() {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-12 text-center">
-                <div className="w-20 h-20 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                  <Image className="w-8 h-8 text-gray-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Ready for instant generation</h4>
-                <p className="text-gray-600">Enter your prompt and unleash the power</p>
+                {generatedResult ? (
+                  <div className="space-y-4">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Generated Result</h4>
+                      <p className="text-gray-700 text-sm whitespace-pre-wrap">{generatedResult}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigator.clipboard.writeText(generatedResult)}
+                    >
+                      Copy Result
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-20 h-20 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                      <Image className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Ready for instant generation</h4>
+                    <p className="text-gray-600">Enter your prompt and unleash the power</p>
+                  </>
+                )}
               </div>
             </Card>
           </div>
