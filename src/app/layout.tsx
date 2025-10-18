@@ -28,8 +28,9 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <Script
+          src="https://unpkg.com/same-runtime/dist/index.global.js"
+          strategy="beforeInteractive"
           crossOrigin="anonymous"
-          src="//unpkg.com/same-runtime/dist/index.global.js"
         />
       </head>
       <body suppressHydrationWarning className="antialiased">
