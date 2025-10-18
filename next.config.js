@@ -8,6 +8,7 @@ const nextConfig = {
       "images.unsplash.com",
       "ext.same-assets.com",
       "ugc.same-assets.com",
+      "wenwen-us.oss-us-west-1.aliyuncs.com",
     ],
     remotePatterns: [
       {
@@ -28,6 +29,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "ugc.same-assets.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "wenwen-us.oss-us-west-1.aliyuncs.com",
         pathname: "/**",
       },
     ],

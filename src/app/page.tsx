@@ -293,16 +293,50 @@ export default function Home() {
                 {generatedResult ? (
                   <div className="space-y-4">
                     <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Generated Result</h4>
-                      <p className="text-gray-700 text-sm whitespace-pre-wrap">{generatedResult}</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Generated Result</h4>
+                      {generatedResult.includes('http') ? (
+                        <div className="space-y-4">
+                          <img
+                            src={generatedResult.match(/https?:\/\/[^\)]+/)?.[0] || generatedResult}
+                            alt="Generated"
+                            className="w-full max-w-md mx-auto rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling!.style.display = 'block';
+                            }}
+                          />
+                          <div style={{display: 'none'}} className="text-gray-700 text-sm">
+                            <p>图片加载失败，URL: {generatedResult}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-700 text-sm whitespace-pre-wrap">{generatedResult}</p>
+                      )}
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => navigator.clipboard.writeText(generatedResult)}
-                    >
-                      Copy Result
-                    </Button>
+                    <div className="flex gap-2 justify-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigator.clipboard.writeText(generatedResult)}
+                      >
+                        Copy URL
+                      </Button>
+                      {generatedResult.includes('http') && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const link = document.createElement('a');
+                            const imageUrl = generatedResult.match(/https?:\/\/[^\)]+/)?.[0] || generatedResult;
+                            link.href = imageUrl;
+                            link.download = 'generated-image.png';
+                            link.click();
+                          }}
+                        >
+                          Download
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <>
