@@ -302,7 +302,7 @@ export default function Home() {
                             className="w-full max-w-md mx-auto rounded-lg border border-gray-200"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling!.style.display = 'block';
+                              (e.currentTarget.nextElementSibling as HTMLElement)!.style.display = 'block';
                             }}
                           />
                           <div style={{display: 'none'}} className="text-gray-700 text-sm">

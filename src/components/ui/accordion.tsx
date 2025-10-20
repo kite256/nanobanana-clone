@@ -56,7 +56,7 @@ const AccordionItem = ({ children, className, value, ...props }: AccordionItemPr
     <div className={cn("border rounded-lg", className)}>
       {React.Children.map(children, child =>
         React.isValidElement(child)
-          ? React.cloneElement(child as React.ReactElement<any>, { value, isOpen })
+          ? React.cloneElement(child as React.ReactElement<AccordionTriggerProps | AccordionContentProps>, { value, isOpen })
           : child
       )}
     </div>
