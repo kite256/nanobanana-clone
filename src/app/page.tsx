@@ -98,7 +98,6 @@ export default function Home() {
                 <Menu className="w-5 h-5" />
               </Button>
             </div>
-            </div>
           </div>
         </div>
       </header>
