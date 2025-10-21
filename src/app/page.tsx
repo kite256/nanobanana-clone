@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Sparkles, Zap, MessageSquare, Image, Target, Layers, Edit3, Repeat, Star, Menu, Upload, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
+import AuthButton from "@/components/auth/AuthButton";
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -92,16 +93,11 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-4">
-              <Button variant="outline" className="hidden sm:inline-flex">
-                Sign In
-              </Button>
-              <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-medium">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Launch Now
-              </Button>
+              <AuthButton />
               <Button variant="ghost" size="sm" className="md:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
+            </div>
             </div>
           </div>
         </div>
