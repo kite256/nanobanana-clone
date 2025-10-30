@@ -11,6 +11,8 @@ This is a Next.js 15 application showcasing the "Nano Banana" AI image editing s
 - **shadcn/ui components** (configured with "new-york" style)
 - **Lucide React** for icons
 - **same-runtime** custom JSX runtime integration
+- **Supabase** for authentication and backend services
+- **OpenAI API** for AI image processing
 
 ## Development Commands
 
@@ -41,6 +43,30 @@ The app uses a `ClientBody` component (`src/app/ClientBody.tsx`) to handle hydra
 - TypeScript configured with `"jsxImportSource": "same-runtime/dist"`
 - External script loaded via unpkg CDN in layout
 
+### Authentication System
+- **Supabase Auth** with GitHub and Google OAuth providers
+- Client-side auth state management in `AuthButton` component
+- Server-side auth utilities in `src/lib/supabase/`
+- API routes for login/logout in `src/app/api/auth/`
+- Auth callback handling at `/auth/callback`
+- SSR-compatible authentication using `@supabase/ssr`
+
+### OAuth Providers Configuration
+**Supported Providers**: GitHub, Google
+
+**Setup Requirements**:
+1. **Supabase Dashboard**: Enable Google and GitHub providers in Auth > Providers
+2. **Google Cloud Console**: Create OAuth 2.0 client credentials
+   - Authorized JavaScript origins: Your domain
+   - Authorized redirect URIs: `https://[project-ref].supabase.co/auth/v1/callback`
+3. **GitHub OAuth App**: Configure in GitHub Developer Settings
+
+### API Routes
+- `/api/generate` - AI image processing using OpenAI GPT-4 Vision
+- `/api/auth/login` - Multi-provider OAuth initiation (GitHub, Google)
+- `/api/auth/logout` - Session termination
+- Custom OpenAI base URL pointing to `breakout.wenwen-ai.com`
+
 ### Component Structure
 - UI components follow shadcn/ui patterns in `src/components/ui/`
 - Main page is a large single-file component with extensive marketing content
@@ -58,6 +84,12 @@ Next.js configured for external images from:
 - Unsplash (source.unsplash.com, images.unsplash.com)
 - Custom domains (ext.same-assets.com, ugc.same-assets.com)
 - Images set to unoptimized mode
+
+### Environment Variables
+Required environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `API_KEY` - OpenAI API key for image processing
 
 ### Linting Setup
 - **Biome** for formatting and basic linting (space indentation, double quotes)
