@@ -4,14 +4,15 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   const { provider } = await request.json()
 
-  if (provider !== 'github') {
-    return NextResponse.json({ error: 'Only GitHub provider is supported' }, { status: 400 })
+  // Support both GitHub and Google OAuth providers
+  if (!provider || !['github', 'google'].includes(provider)) {
+    return NextResponse.json({ error: 'Only GitHub and Google providers are supported' }, { status: 400 })
   }
 
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'github',
+    provider: provider as 'github' | 'google',
     options: {
       redirectTo: `${request.nextUrl.origin}/auth/callback`,
     },

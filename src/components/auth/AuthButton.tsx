@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
-import { Github, LogOut } from "lucide-react"
+import { Github, LogOut, Chrome } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export default function AuthButton() {
@@ -32,14 +32,14 @@ export default function AuthButton() {
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (provider: 'github' | 'google') => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ provider: 'github' }),
+        body: JSON.stringify({ provider }),
       })
 
       const data = await response.json()
@@ -88,9 +88,15 @@ export default function AuthButton() {
   }
 
   return (
-    <Button onClick={handleSignIn}>
-      <Github className="mr-2 h-4 w-4" />
-      Sign in with GitHub
-    </Button>
+    <div className="flex flex-col sm:flex-row gap-2">
+      <Button onClick={() => handleSignIn('github')} variant="outline">
+        <Github className="mr-2 h-4 w-4" />
+        GitHub
+      </Button>
+      <Button onClick={() => handleSignIn('google')} variant="outline">
+        <Chrome className="mr-2 h-4 w-4" />
+        Google
+      </Button>
+    </div>
   )
 }
